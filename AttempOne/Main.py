@@ -48,11 +48,12 @@ def trainAI(minvalueM, maxvalueM, minvalueY, maxvalueY) :
     print("Training iteration: " + str(iterationCount))
 
     nodes = []
-    for i in range(0, 100) :
+    for i in range(0, 10) :
         m = guessM(minvalueM, maxvalueM)
         y = guessY(minvalueY, maxvalueY)
         nodes.append([m, y])
 
+    results = []
     for node in nodes :
         print("Node: " + str(node))
         errors = 0
@@ -61,13 +62,52 @@ def trainAI(minvalueM, maxvalueM, minvalueY, maxvalueY) :
             x = scenario[0]
             a = scenario[1]
             guess = node[0] * x + node[1]
-            error = abs(guess - a)
-            if error == 0 :
-                return
-            else :
-              errors += error
+            error = guess - a
+            errors += error
         print("Error: " + str(errors))
-            
+        results.append([node, errors])
+
+    #find best 10 nodes based on error distance to 0
+    results.sort(key=lambda x: abs(x[1]))
+    bestNodes = results[:10]
+    print("Best nodes: " + str(bestNodes))
+
+    lowestErrors = bestNodes[0][1]
+
+    # Define new min and max values for m and y
+    listOfMValues = [node[0][0] for node in bestNodes]
+    listOfYValues = [node[0][1] for node in bestNodes]
+
+    newMinValueM = min(listOfMValues)
+    newMaxValueM = max(listOfMValues)
+    newMinValueY = min(listOfYValues)
+    newMaxValueY = max(listOfYValues)
+
+    print("New min and max values for m: " + str(newMinValueM) + " " + str(newMaxValueM))
+    print("New min and max values for y: " + str(newMinValueY) + " " + str(newMaxValueY))
+    return [newMinValueM, newMaxValueM, newMinValueY, newMaxValueY , lowestErrors]
+
+
+minValueM = -10
+maxValueM = 10
+minValueY = -10
+maxValueY = 10
+
+while True :
+    sectionLine()
+    print("Training iteration: " + str(i))
+    newValues = trainAI(minValueM, maxValueM, minValueY, maxValueY)
+    minValueM = newValues[0]
+    maxValueM = newValues[1]
+    minValueY = newValues[2]
+    maxValueY = newValues[3]
+    print("Lowest errors: " + str(newValues[4]))
+    if newValues[4] == 0 :
+        print("Training complete")
+        break
+    sectionLine()
+
+        
     
 
 
